@@ -4,7 +4,7 @@ weights = {"sw": {"sv10": 110, "sv12": 116, "w12": 75, "sv8": 101, "sv6": 104, "
 # File: ts.py
 # Title: Chatango TagServer Number Library
 # Author: ASL97/ASL <asl97@outlook.com>
-# Version: 0.1
+# Version: 0.0.1.0
 # Bug report: https://github.com/asl97/ct.py
 # Notes :
 #        DON'T EMAIL ME UNLESS YOU NEED TO

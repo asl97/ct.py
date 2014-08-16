@@ -2,7 +2,7 @@
 # File: ct.py
 # Title: Chatango Library
 # Author: ASL97/ASL <asl97@outlook.com>
-# Version: 0.0.1.0
+# Version: 0.0.2.2
 # Bug report: https://github.com/asl97/ct.py
 # Notes : DON'T EMAIL ME UNLESS YOU NEED TO
 # TODO: *blank*
@@ -28,156 +28,14 @@ import threading
 
 ### Variables, Custom & Non-Standard Modules
 
+import requests
+import register
 import ts
 import tm
-import requests
-
 
 #################################################################
 
 ### Class
-
-# registering function/hooks class
-
-registered = {}
-
-class register:
-
-    def _setup_register(name,value):
-        def internal(func):
-            registered[name] = value
-            return func
-        return internal
-
-    def _master_register_function(self,value,func):
-        """this function is not to be use by noobs"""
-        registered[value].append(func)
-
-    # chatango related stuff
-    @_setup_register("message",[])
-    def on_message(func):
-        """register a function to be call on message"""
-        registered["message"].append(func)
-
-    @_setup_register("ok",[])
-    def on_ok(func):
-        """register a function to be call on ok"""
-        registered["ok"].append(func)
-
-    @_setup_register("denied",[])
-    def on_denied(func):
-        """register a function to be call on denied"""
-        registered["denied"].append(func)
-
-    @_setup_register("inited",[])
-    def on_inited(func):
-        """register a function to be call on inited"""
-        registered["inited"].append(func)
-
-    @_setup_register("delete",[])
-    def on_delete(func):
-        """register a function to be call on message"""
-        registered["delete"].append(func)
-
-    @_setup_register("deleteall",[])
-    def on_delete(func):
-        """register a function to be call on message"""
-        registered["deleteall"].append(func)
-
-    @_setup_register("n",[])
-    def on_user_count_change(func):
-        """register a function to be call on user count change"""
-        registered["n"].append(func)
-
-    @_setup_register("u",[])
-    def on_message_id(func):
-        """register a function to be call on message id"""
-        registered["u"].append(func)
-
-    @_setup_register("b",[])
-    def on_raw_message(func):
-        """register a function to be call on raw message"""
-        registered["b"].append(func)
-
-    @_setup_register("blocklist",[])
-    def on_receive_blocklist(func):
-        """register a function to be call when blocklist is receive"""
-        registered["n"].append(func)
-
-    @_setup_register("show_fw",[])
-    def on_flood_warning(func):
-        """register a function to be call on flood warning"""
-        registered["show_fw"].append(func)
-
-    @_setup_register("show_tb",[])
-    def on_flood_warning(func):
-        """register a function to be call on flood ban"""
-        registered["show_tb"].append(func)
-
-    @_setup_register("tb",[])
-    def on_flood_warning(func):
-        """register a function to be call on flood ban repeat"""
-        registered["tb"].append(func)
-
-    @_setup_register("blocked",[])
-    def on_blocked(func):
-        """register a function to be call someone get unblocked"""
-        registered["blocked"].append(func)
-
-    @_setup_register("unblocked",[])
-    def on_unblocked(func):
-        """register a function to be call someone get unblocked"""
-        registered["unblocked"].append(func)
-
-    @_setup_register("participant",[])
-    def on_participant(func):
-        """register a function to be call when someone join or leave"""
-        registered["participant"].append(func)
-
-    # bot related stuff
-    @_setup_register("__init__",[])
-    def on_init(func):
-        """register a function to be call on start"""
-        registered["__init__"].append(func)
-
-    @_setup_register("connect",[])
-    def on_connect(func):
-        """register a function to be call on connect"""
-        registered["connect"].append(func)
-
-    @_setup_register("disconnect",[])
-    def on_disconnect(func):
-        """register a function to be call on disconnect"""
-        registered["disconnect"].append(func)
-
-    @_setup_register("reconnect",[])
-    def on_reconnect(func):
-        """register a function to be call on reconnect"""
-        registered["reconnect"].append(func)
-
-    @_setup_register("join",[])
-    def on_join(func):
-        """register a function to be call when people join"""
-        registered["join"].append(func)
-
-    @_setup_register("leave",[])
-    def on_leave(func):
-        """register a function to be call when people leave"""
-        registered["leave"].append(func)
-
-    @_setup_register("raw",[])
-    def on_raw(func):
-        """register a function to be call when getting data"""
-        registered["raw"].append(func)
-
-    @_setup_register("doc",{})
-    @_setup_register("cmd",{})
-    def cmd(cmd):
-        """register a cmd with a function to be call"""
-        def __internal(func, doc=""):
-            registered["cmd"][cmd] = func
-            registered["doc"][cmd] = doc
-        return __internal
 
 # room
 
@@ -212,12 +70,12 @@ class room_base:
             self.rbuf = data[-1]
 
     def process(self, data):
-        for func in registered["raw"]:
+        for func in register.registered["raw"]:
             tm.set_job(func,self.cm,self,data)
         data = data.split(":")
         cmd, args = data[0], data[1:]
-        if cmd in registered:
-            for func in registered[cmd]:
+        if cmd in register.registered:
+            for func in register.registered[cmd]:
                 if args:
                     tm.set_job(func,self,args)
                 else:
@@ -255,7 +113,6 @@ class room_base:
         self.sock.connect((self.server, self.port))
         self.sock.setblocking(False)
         self.auth()
-        #self.pingTask = self.mgr.setInterval(self.mgr._pingDelay, self.ping)
 
     def disconnect(self):
         self.sock.close()
@@ -295,10 +152,10 @@ class room_minimum(room_base):
     def inited(self):
         if not self.connected:
             self.connected = True
-            for func in registered["connect"]:
+            for func in register.registered["connect"]:
                 tm.set_job(func,self.cm,self)
         else:
-            for func in registered["reconnect"]:
+            for func in register.registered["reconnect"]:
                 tm.set_job(func,self.cm,self)
         self.swlock(False)
 
@@ -345,15 +202,15 @@ class room_minimum(room_base):
             del self.msg_queue[args[0]]
             setattr(msg, "msgid", args[1])
             if msg.body:
-                for func in registered["message"]:
+                for func in register.registered["message"]:
                     tm.set_job(func,self.cm,msg)
                 tmp = msg.body.split(" ")
                 if len(tmp) == 1:
                     cmd, args = tmp[0], ""
                 else:
                     cmd, args = tmp[0], tmp[1:]
-                if cmd in registered["cmd"]:
-                    tm.set_job(registered["cmd"][cmd],self.cm,msg,args)
+                if cmd in register.registered["cmd"]:
+                    tm.set_job(register.registered["cmd"][cmd],self.cm,msg,args)
 
 class room_default(room_minimum):
 
@@ -423,15 +280,14 @@ class connection_manager_base:
     def __init__(self, name, password, pm=False):
         self.name = name
         self.password = password
+        self.pm = pm
         self.base_setup()
         self.other_setup()
 
     def base_setup(self):
-        self.pm = pm
         self.rooms = {}
         self.pms = {}
         self.users = {}
-        self.register = register()
         self.running = True
         self.timer = 0.2
         self.ping_interval = 20
@@ -457,28 +313,31 @@ class connection_manager_base:
                     try:
                         module = imp.load_source(os.path.basename(filename)[:-3], filename)
                     except:
-                        print("Error loading %s: %s" % (name, e), file=sys.stderr)
+                        print("[dynamic module loader]Error loading %s: %s" % (name, e), file=sys.stderr)
                     else:
-                        print("loaded %s" % (name))
+                        print("[dynamic module loader]loaded %s" % (name))
                         for name, obj in vars(module):
                             # if obj has specify a name, use that, else use the variable name
                             if hasattr(obj, "cmd"):
                                 name = obj.cmd
 
-                            registered["cmd"][name] = obj
+                            register.registered["cmd"][name] = obj
                             if hasattr(obj, "doc"):
-                                registered["doc"][name] = obj.doc
+                                register.registered["doc"][name] = obj.doc
                             elif hasattr(obj, "__doc__"):
-                                registered["doc"][name] = obj.__doc__
+                                register.registered["doc"][name] = obj.__doc__
 
     def ping(self):
         for room_name in self.rooms:
             room = self.rooms[room_name]
             if room.ping_time < time.time():
+                room.ping_time += self.ping_interval
                 room.write("")
 
     def main(self):
+        loop = 0
         while self.running:
+            loop+=1
             conns = {self.rooms[room].sock:self.rooms[room] for room in self.rooms}
             socks = conns.keys()
             wsocks = [sock for sock,room in conns.items() if room.wbuf != b""]
@@ -532,4 +391,5 @@ class connection_manager_bloated(connection_manager_default):
     def other_setup(self):
         self.room = room_bloated
         self.user = user_bloated
+        self.register_modules(module_folder)
 

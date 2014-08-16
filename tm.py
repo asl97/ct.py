@@ -2,7 +2,7 @@
 # File: tm.py
 # Title: Task (Job) Manager Library
 # Author: ASL97/ASL <asl97@outlook.com>
-# Version: 0.1
+# Version: 0.0.2.1
 # Bug report: https://github.com/asl97/ct.py
 # Notes : DON'T EMAIL ME UNLESS YOU NEED TO
 # TODO: *blank*
@@ -18,7 +18,7 @@ class job_manager:
 
     def __init__(self):
         self.job_queue = queue.Queue()
-        self.job_lock = threading.Lock()
+        #self.job_lock = threading.Lock()
 
     def job_thread(self):
         while True:
@@ -48,9 +48,9 @@ class _task:
         self.interval = interval
         self.job = (func,args,kw)
 
-# task manager
+# scheduler (task manager)
 
-class task_manager:
+class scheduler:
 
     def __init__(self):
         self.tasks = set()
@@ -79,7 +79,7 @@ class task_manager:
     def remove_task(self, task):
         self.tasks.remove(task)
 
-_wrapper = task_manager()
+_wrapper = scheduler()
 tick = _wrapper.tick
 set_timeout = _wrapper.set_timeout
 set_interval = _wrapper.set_interval
