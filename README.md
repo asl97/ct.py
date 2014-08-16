@@ -1,5 +1,11 @@
 ct.py ~ ChaTango library
 =====
+
+WARNING, THIS ISN'T READY FOR USAGE YET
+=====
+
+i am just pushing it to a git repo dev branch to show that i am really working on it
+
 before making an issue, please read the ISSUE.md
 
 ---
