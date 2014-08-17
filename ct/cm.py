@@ -1,13 +1,11 @@
 ################################################################
-# File: ct.py
-# Title: Chatango Library
+# File: cm.py
+# Title: Connection manager
 # Author: ASL97/ASL <asl97@outlook.com>
-# Version: 0.0.2.2
+# Version: 0.0.2.4
 # Bug report: https://github.com/asl97/ct.py
 # Notes : DON'T EMAIL ME UNLESS YOU NEED TO
 # TODO: *blank*
-#      not blank
-#      register doc/help
 ################################################################
 
 ### Imports, Standard Modules
@@ -29,9 +27,10 @@ import threading
 ### Variables, Custom & Non-Standard Modules
 
 import requests
-import register
-import ts
-import tm
+
+from . import register
+from . import ts
+from . import tm
 
 #################################################################
 
@@ -335,9 +334,7 @@ class connection_manager_base:
                 room.write("")
 
     def main(self):
-        loop = 0
         while self.running:
-            loop+=1
             conns = {self.rooms[room].sock:self.rooms[room] for room in self.rooms}
             socks = conns.keys()
             wsocks = [sock for sock,room in conns.items() if room.wbuf != b""]
