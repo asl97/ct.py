@@ -8,6 +8,9 @@
 # TODO: *blank*
 ################################################################
 
+# simulate a module, when importing ct, other module will
+# be able to access the package like how it was before
+
 from . import register
 from . import cm
 from . import ts

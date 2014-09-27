@@ -10,7 +10,8 @@
 
 from ct import cm, register
 
-class example(cm.connection_manager_minimum):
+#class example(cm.connection_manager_minimum):
+class example(cm.connection_manager_default):
 
     @register.on_connect
     def onconnect(self,room):
