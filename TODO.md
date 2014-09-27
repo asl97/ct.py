@@ -1,0 +1,7 @@
+- [ ] use markdown for the TODO.md (formatting the text)
+- [ ] finish my half-done code :/
+- [ ] move the variables which contain the rooms/pm/user/etc into their own module
+- [ ] clean up the imports in cm.py
+- [ ] clean up all my codes :/
+- [ ] some proper docs/how-to on using this module/library
+- [ ] fix problems in the example.py cause by 0.0.3.0 update
