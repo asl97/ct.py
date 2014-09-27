@@ -6,3 +6,4 @@
 - [ ] some proper docs/how-to on using this module/library
 - [ ] fix problems in the example.py cause by 0.0.3.0 update
 - [ ] get started on the pm.py
+- [ ] isolate the modules as much as possible
