@@ -21,7 +21,25 @@ from . import register
 from . import ts
 from . import tm
 
-class room_base:
+class _system:
+
+    def __init__(self, cm):
+        self.rooms = {}
+        self.cm = cm
+        self.room = self.cm.room
+
+    def join(self, name):
+        name = name.lower()
+        if not name in self.rooms:
+            self.rooms[name] = self.room(name)
+
+    def leave(self, room):
+        room = room.lower()
+        if room in self.rooms:
+            self.rooms[room].close()
+            del self.rooms[room]
+
+class base:
 
     def __init__(self, name, cm):
         """cm == connection manager"""
@@ -127,7 +145,7 @@ class room_base:
         except:
             return "NNNN"
 
-class room_minimum(room_base):
+class minimum(base):
 
     # register function
     @register.on_inited
@@ -194,10 +212,10 @@ class room_minimum(room_base):
                 if cmd in register.registered["cmd"]:
                     tm.set_job(register.registered["cmd"][cmd],self.cm,msg,args)
 
-class room_default(room_minimum):
+class default(minimum):
 
     pass
 
-class room_bloated(room_default):
+class bloated(default):
 
     pass

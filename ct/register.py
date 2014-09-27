@@ -8,6 +8,13 @@
 # TODO: *blank*
 ################################################################
 
+# standard modules use only in register_modules
+import importlib
+import register
+import sys
+import os
+
+
 # the registry which contain the registered function
 
 class _registry:
@@ -26,11 +33,35 @@ class _registry:
         """this function is not to be use by noobs"""
         registered[value].append(func)
 
+    def register_modules(self,module_folder):
+        if os.path.isdir(module_folder):
+            for filename in os.listdir(module_folder):
+                if filename.endswith(".py") and not filename.startswith("_"):
+                    try:
+                        module = importlib.machinery(
+                                os.path.basename(filename)[:-3],
+                                os.path.join(module_folder,filename)
+                        ).load_module()
+                    except Exception as e:
+                        print("[dynamic module loader]Error loading %s: %s" % (filename, e), file=sys.stderr)
+                    else:
+                        print("[dynamic module loader]loaded %s" % (filename))
+                        for obj in vars(module).values():
+                            # obj must specify a name
+                            if hasattr(obj, "cmd"):
+                                name = obj.cmd
+                                register.registered["cmd"][name] = obj
+                                if hasattr(obj, "doc"):
+                                    register.registered["doc"][name] = obj.doc
+                                elif hasattr(obj, "__doc__"):
+                                    register.registered["doc"][name] = obj.__doc__
+
 # registering function/hooks class
 
 _r = _registry()
 setup = _r._setup
 registered = _r.registered
+modules = _r.register_modules
 
 # chatango related stuff
 @setup("message",[])

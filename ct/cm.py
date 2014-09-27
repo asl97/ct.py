@@ -29,6 +29,10 @@ import threading
 import requests
 
 from . import register
+from . import message
+from . import room
+from . import user
+from . import pm
 from . import ts
 from . import tm
 
@@ -45,49 +49,29 @@ class connection_manager_base:
         self.other_setup()
 
     def base_setup(self):
-        self.rooms = {}
-        self.pms = {}
-        self.users = {}
+        ### basic setting for bot
         self.running = True
         self.timer = 0.2
         self.ping_interval = 20
 
+        ### module setting for bot
+
+        # rooms
+        self._room = room._system(self)
+        self.join = self._room.join
+        self.leave = self._room.leave
+
+        # users
+        self._user = user._system(self)
+        self.user = self._user.add
+
+        # make it so rooms, pm and users is accessible in the bot
+        self.rooms = self._room.rooms
+        self.pm = {}
+        self.users = self._user.users
+
     def other_setup(self):
         pass
-
-    def join(self, name):
-        name = name.lower()
-        if not name in self.rooms:
-            self.rooms[name] = self.room(name,self)
-
-    def leave(self, room):
-        room = room.lower()
-        if room in self.rooms:
-            self.rooms[room].close()
-            del self.rooms[room]
-
-    def register_modules(self,module_folder):
-        if os.path.isdir(module_folder):
-            for filename in os.listdir(module_folder):
-                if filename.endswith(".py") and not filename.startswith("_"):
-                    try:
-                        module = importlib.machinery(
-                                os.path.basename(filename)[:-3],
-                                os.path.join(module_folder,filename)
-                        ).load_module()
-                    except Exception as e:
-                        print("[dynamic module loader]Error loading %s: %s" % (filename, e), file=sys.stderr)
-                    else:
-                        print("[dynamic module loader]loaded %s" % (filename))
-                        for obj in vars(module).values():
-                            # obj must specify a name
-                            if hasattr(obj, "cmd"):
-                                name = obj.cmd
-                                register.registered["cmd"][name] = obj
-                                if hasattr(obj, "doc"):
-                                    register.registered["doc"][name] = obj.doc
-                                elif hasattr(obj, "__doc__"):
-                                    register.registered["doc"][name] = obj.__doc__
 
     def ping(self):
         for room_name in self.rooms:
@@ -121,6 +105,7 @@ class connection_manager_base:
                     pass
             # do the ping in the same thread as the connection manager
             # instead of the job/task threads
+            # since the ping shouldn't take too long... hopefully...
             self.ping()
             tm.tick()
 
@@ -135,21 +120,21 @@ class connection_manager_base:
 class connection_manager_minimum(connection_manager_base):
 
     def other_setup(self):
-        self.room = room_minimum
-        self.user = user_minimum
+        self.room = room.minimum
+        self.user = user.minimum
 
 
 class connection_manager_default(connection_manager_minimum):
 
     def other_setup(self):
-        self.room = room_default
-        self.user = user_default
-        self.register_modules(self.module_folder)
+        self.room = room.default
+        self.user = user.default
+        register.modules(self.module_folder)
 
 class connection_manager_bloated(connection_manager_default):
 
     def other_setup(self):
-        self.room = room_bloated
-        self.user = user_bloated
-        self.register_modules(self.module_folder)
+        self.room = room.bloated
+        self.user = user.bloated
+        register.modules(self.module_folder)
 
