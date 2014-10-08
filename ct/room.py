@@ -195,23 +195,6 @@ class minimum(base):
         )
         self.msg_queue[args[5]] = msg
 
-    @register.on_message_id
-    def messageid(self,args):
-        if args[0] in self.msg_queue:
-            msg = self.msg_queue[args[0]]
-            del self.msg_queue[args[0]]
-            setattr(msg, "msgid", args[1])
-            if msg.body:
-                for func in register.registered["message"]:
-                    tm.set_job(func,self.cm,msg)
-                tmp = msg.body.split(" ")
-                if len(tmp) == 1:
-                    cmd, args = tmp[0], ""
-                else:
-                    cmd, args = tmp[0], tmp[1:]
-                if cmd in register.registered["cmd"]:
-                    tm.set_job(register.registered["cmd"][cmd],self.cm,msg,args)
-
 class default(minimum):
 
     pass

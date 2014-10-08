@@ -197,3 +197,16 @@ def cmd(cmd, doc="", lvl=False):
             registered["lvl"][cmd] = func.__lvl__
     return __internal
 
+# functions/api
+
+def check_cmd(cm,msg):
+    if msg.body:
+        for func in registered["message"]:
+            tm.set_job(func,cm,msg)
+        tmp = msg.body.split(" ")
+        if len(tmp) == 1:
+            cmd, args = tmp[0], ""
+        else:
+            cmd, args = tmp[0], tmp[1:]
+        if cmd in registered["cmd"]:
+            tm.set_job(registered["cmd"][cmd],cm,msg,args)
